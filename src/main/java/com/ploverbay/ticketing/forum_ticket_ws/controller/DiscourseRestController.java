@@ -85,8 +85,6 @@ public class DiscourseRestController {
             url += ".json";
             if (apiKey != null) {
                 url += "?api_key=" + apiKey;
-            }
-            if (username !=null) {
                 url += "&api_username=" + username;
             }
             return url;
