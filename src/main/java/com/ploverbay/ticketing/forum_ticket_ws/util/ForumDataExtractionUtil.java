@@ -30,6 +30,14 @@ public class ForumDataExtractionUtil {
 
     private static String getResponseFromUrl(String url) {
         if (url != null && !url.trim().equals("")) {
+
+            System.out.println("\n");
+            System.out.println("FORUM-LINK");
+            System.out.println("--------------------------------------------");
+            System.out.println(url);
+            System.out.println("--------------------------------------------");
+            System.out.println("\n");
+
             RestTemplate restTemplate = new RestTemplate();
             HttpEntity<String> entity = new HttpEntity<>(getHttpHeaders());
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
