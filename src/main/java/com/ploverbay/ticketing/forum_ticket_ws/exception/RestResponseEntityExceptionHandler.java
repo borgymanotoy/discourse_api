@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -21,7 +22,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         return new ResponseEntity<Object>(status, new HttpHeaders(), HttpStatus.FORBIDDEN);
     }
 
-    @ExceptionHandler({ AccessDeniedException.class })
+    @ExceptionHandler({ AccessDeniedException.class,  HttpClientErrorException.class})
     public ResponseEntity<Object> handleAccessDeniedException(Exception ex, WebRequest request) {
         RequestStatusInfo status = new RequestStatusInfo(HttpStatus.FORBIDDEN,
                 "You do not have enough access/permission");

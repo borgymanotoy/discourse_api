@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +36,7 @@ public class DiscourseRestController {
 
     @GetMapping(value = "/forum-ticket")
     public ResponseEntity<?> getForumTicket(@RequestParam(value = "forum", required = false) String url,
-                                          @RequestParam(value = "key", required = false) String apiKey){
+                                          @RequestParam(value = "key", required = false) String apiKey) {
         String forumUrl = appendApiInfo(url, apiKey, "system");
         DiscourseTopic topic = ForumDataExtractionUtil.getDiscourseForumTopicDetails(forumUrl);
         TicketDetails ticketDetails = new TicketDetails();
@@ -46,12 +48,19 @@ public class DiscourseRestController {
             if(participants != null && participants.size() > 0) {
                 customerUsername = participants.get(0).getUsername();
                 if (customerUsername != null) {
-                    DiscourseUser user = ForumDataExtractionUtil.getDiscourseUser(customerUsername, apiKey, "system");
-                    if (user != null) {
-                        List<String> emailAddresses = new ArrayList<>();
-                        emailAddresses.add(user.getEmail());
-                        ticketDetails.setContactName(user.getName());
-                        ticketDetails.setEmailAddresses(emailAddresses);
+                    try {
+                        String domain = ForumDataExtractionUtil.getDomainName(forumUrl);
+                        DiscourseUser user = ForumDataExtractionUtil.getDiscourseUser(domain, customerUsername, apiKey, "system");
+                        if (user != null) {
+                            List<String> emailAddresses = new ArrayList<>();
+                            emailAddresses.add(user.getEmail());
+                            ticketDetails.setContactName(user.getName());
+                            ticketDetails.setEmailAddresses(emailAddresses);
+                        }
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
                     }
                 }
             }
