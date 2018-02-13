@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-@CrossOrigin(origins = {"http://localhost:3000", "https://borgymanotoy.auth0.com"})
+@CrossOrigin(origins = {"http://localhost:3000", "https://discourse-api-reactjs.herokuapp.com/"})
 public class DiscourseRestController {
 
     @Autowired
