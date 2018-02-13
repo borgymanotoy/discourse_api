@@ -26,7 +26,7 @@ public class ForumDataExtractionUtil {
     public static DiscourseUser getDiscourseUser(String domain, String username, String apiKey, String user) {
         if (domain != null && username != null) {
             String url = domain + "/users/" + username + ".json";
-            if (apiKey != null) {
+            if (apiKey != null && !apiKey.trim().equals("")) {
                 url += "?api_key=" + apiKey + "&api_username=" + user;
             }
             String strResponse = getResponseFromUrl(url);
