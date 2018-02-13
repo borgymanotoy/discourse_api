@@ -8,10 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -37,6 +34,18 @@ public class DiscourseRestController {
     @GetMapping(value = "/forum-ticket")
     public ResponseEntity<?> getForumTicket(@RequestParam(value = "forum", required = false) String url,
                                           @RequestParam(value = "key", required = false) String apiKey) {
+        TicketDetails ticketDetails = extractForumTicketDetails(url, apiKey);
+        return new ResponseEntity<Object>(ticketDetails, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/forum-ticket")
+    public ResponseEntity<?> postForumTicket(@RequestParam(value = "forum", required = false) String url,
+                                            @RequestParam(value = "key", required = false) String apiKey) {
+        TicketDetails ticketDetails = extractForumTicketDetails(url, apiKey);
+        return new ResponseEntity<Object>(ticketDetails, HttpStatus.OK);
+    }
+
+    private TicketDetails extractForumTicketDetails(String url, String apiKey) {
         String forumUrl = appendApiInfo(url, apiKey, "system");
         DiscourseTopic topic = ForumDataExtractionUtil.getDiscourseForumTopicDetails(forumUrl);
         TicketDetails ticketDetails = new TicketDetails();
@@ -85,8 +94,7 @@ public class DiscourseRestController {
             ticketDetails.setSubject(subject);
             ticketDetails.setHistory(historyLogs);
         }
-
-        return new ResponseEntity<Object>(ticketDetails, HttpStatus.OK);
+        return ticketDetails;
     }
 
     private String appendApiInfo(String url, String apiKey, String username) {
