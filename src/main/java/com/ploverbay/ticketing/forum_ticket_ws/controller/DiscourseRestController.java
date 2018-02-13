@@ -17,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+@CrossOrigin(origins = {"http://localhost:3000", "https://borgymanotoy.auth0.com"})
 public class DiscourseRestController {
 
     @Autowired
@@ -100,7 +101,7 @@ public class DiscourseRestController {
     private String appendApiInfo(String url, String apiKey, String username) {
         if (url != null) {
             url += ".json";
-            if (apiKey != null) {
+            if (apiKey != null && !apiKey.trim().equals("")) {
                 url += "?api_key=" + apiKey;
                 url += "&api_username=" + username;
             }
