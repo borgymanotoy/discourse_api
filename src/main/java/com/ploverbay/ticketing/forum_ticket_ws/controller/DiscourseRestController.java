@@ -34,23 +34,38 @@ public class DiscourseRestController {
     @GetMapping(value = "/forum-ticket")
     public ResponseEntity<?> getForumTicket(@RequestParam(value = "forum", required = false) String url,
                                           @RequestParam(value = "key", required = false) String apiKey) {
-        TicketDetails ticketDetails = extractForumTicketDetails(url, apiKey);
+        TicketDetails ticketDetails = null;
+        try {
+            ticketDetails = extractForumTicketDetails(url, apiKey);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
         return new ResponseEntity<Object>(ticketDetails, HttpStatus.OK);
     }
 
     @PostMapping(value = "/forum-ticket")
     public ResponseEntity<?> postForumTicket(@RequestParam(value = "forum", required = false) String url,
                                             @RequestParam(value = "key", required = false) String apiKey) {
-        TicketDetails ticketDetails = extractForumTicketDetails(url, apiKey);
+        TicketDetails ticketDetails = null;
+        try {
+            ticketDetails = extractForumTicketDetails(url, apiKey);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
         return new ResponseEntity<Object>(ticketDetails, HttpStatus.OK);
     }
 
-    private TicketDetails extractForumTicketDetails(String url, String apiKey) {
+    private TicketDetails extractForumTicketDetails(String url, String apiKey) throws MalformedURLException, URISyntaxException {
         String forumUrl = appendApiInfo(url, apiKey, "system");
         DiscourseTopic topic = ForumDataExtractionUtil.getDiscourseForumTopicDetails(forumUrl);
         TicketDetails ticketDetails = new TicketDetails();
         ticketDetails.setForumLink(url);
         String customerUsername = null;
+        String domain = null;
         if (topic != null && topic.getDetails() != null) {
             ticketDetails.setTopicDate(topic.getCreatedAt());
             List<DiscourseTopicParticipant> participants = topic.getDetails().getParticipants();
@@ -58,7 +73,7 @@ public class DiscourseRestController {
                 customerUsername = participants.get(0).getUsername();
                 if (customerUsername != null) {
                     try {
-                        String domain = ForumDataExtractionUtil.getDomainName(forumUrl);
+                        domain = ForumDataExtractionUtil.getDomainName(forumUrl);
                         DiscourseUser user = ForumDataExtractionUtil.getDiscourseUser(domain, customerUsername, apiKey, "system");
                         if (user != null) {
                             ticketDetails.setContactName(user.getName());
@@ -79,14 +94,17 @@ public class DiscourseRestController {
 
         List<HistoryLog> historyLogs = new ArrayList<>();
         if (topic != null && topic.getPostStream() != null && topic.getPostStream().getPosts() != null) {
+            Integer topicId = topic.getId();
+            String topicSlug = topic.getSlug();
             String subject = null;
             for (DiscourseTopicPost p : topic.getPostStream().getPosts()) {
                 if (p.getUsername() != null && !p.getUsername().equalsIgnoreCase("system")) {
                     if (subject == null) {
                         subject = cleanupSubject(p.getCooked());
                     }
+                    String link = domain + "/t/" + topicSlug + "/" + topicId + "/" + p.getPostNumber();
                     HistoryLog history = new HistoryLog();
-                    history.setLink(url + "/" + p.getPostNumber());
+                    history.setLink(link);
                     history.setUser(p.getUsername());
                     history.setMessage(cleanupSubject(p.getCooked()));
                     history.setDate(p.getUpdatedAt());
