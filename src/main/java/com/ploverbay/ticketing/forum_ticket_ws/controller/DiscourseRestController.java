@@ -17,7 +17,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-//@CrossOrigin(origins = {"http://localhost:3000", "https://discourse-api-reactjs.herokuapp.com/"})
 public class DiscourseRestController {
 
     @Autowired
@@ -62,10 +61,12 @@ public class DiscourseRestController {
                         String domain = ForumDataExtractionUtil.getDomainName(forumUrl);
                         DiscourseUser user = ForumDataExtractionUtil.getDiscourseUser(domain, customerUsername, apiKey, "system");
                         if (user != null) {
-                            List<String> emailAddresses = new ArrayList<>();
-                            emailAddresses.add(user.getEmail());
                             ticketDetails.setContactName(user.getName());
-                            ticketDetails.setEmailAddresses(emailAddresses);
+                            if (user.getEmail() != null && !user.getEmail().trim().equals("")) {
+                                List<String> emailAddresses = new ArrayList<>();
+                                emailAddresses.add(user.getEmail());
+                                ticketDetails.setEmailAddresses(emailAddresses);
+                            }
                         }
                     } catch (URISyntaxException e) {
                         e.printStackTrace();
